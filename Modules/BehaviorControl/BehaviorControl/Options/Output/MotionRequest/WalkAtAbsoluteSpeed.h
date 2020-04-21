@@ -2,9 +2,9 @@
  * Sets all members of the MotionRequest representation for executing an absoluteSpeedMode-WalkRequest
  * (i.e. Walk at a \c speed)
  * @param speed Walking speeds, in mm/s and radian/s.
- *              e.g.  Pose2f(0.f, 50.f, 0.f) lets move the robot forward at 50 mm/s
- *                    Pose2f(0.f, 50.f, 50.f) lets move the robot diagonal
- *                    Pose2f(0.2f, 100.f, 0.f) lets move the robot in a circle
+ *              e.g.  Pose2f(0.f, 50.f, 0.f) lets move the robot forward at 50 mm/s//直线移动
+ *                    Pose2f(0.f, 50.f, 50.f) lets move the robot diagonal//对角移动
+ *                    Pose2f(0.2f, 100.f, 0.f) lets move the robot in a circle//转圈
  */
 option(WalkAtAbsoluteSpeed, (const Pose2f&) speed)
 {
