@@ -20,6 +20,7 @@ option(Striker)
       Stand();//目前来看是在进球后会跳转到stand中等待
     }
   }
+  
 state(JudgeBall)
 {
   transition
