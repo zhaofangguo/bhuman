@@ -54,11 +54,12 @@ state(ReadyToReceive)
     transition
     {
          
-         if((theObstacleModel.obstacles[i].velocity.x()==0)&&(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)&&state_time>15000)
+         if((theBallModel.estimate.position.norm()<200)&&(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)&&state_time>15000)
         goto searchForBall;
-        if((theObstacleModel.obstacles[i].velocity.x()==0)&&(theLibCodeRelease.timeSinceBallWasSeen < 300)&&state_time>11000)
+        if((theBallModel.estimate.position.norm()<200)&&(theLibCodeRelease.timeSinceBallWasSeen < 300)&&state_time>11000)
         goto walkToBall;
     }
+    
     action
     {
         HeadControlMode(HeadControl::lookForward);
