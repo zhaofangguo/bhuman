@@ -60,12 +60,12 @@ state(IfOrNot)
   transition
   {
      if((theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut||(std::fabs(theBallModel.estimate.position.x())>std::fabs(theObstacleModel.obstacles[i].center.x())))&&theObstacleModel.obstacles.size()!=2)//初始值是7000ms
-        goto FindRobot; 
-    if((std::fabs(theBallModel.estimate.position.x())<=std::fabs(theObstacleModel.obstacles[i].center.x()))&&(std::fabs(theObstacleModel.obstacles[i].center.y())-(std::fabs(theBallModel.estimate.position.y()))<=500.f)&&theObstacleModel.obstacles.size()==2)
+        goto FindRobot; //壁障
+    if(theObstacleModel.obstacles.size()==2)
      //goto SnatchTheBall;
-      goto turnToBall;
+      goto turnToBall;//传球
       if((std::fabs(theBallModel.estimate.position.x())<=std::fabs(theObstacleModel.obstacles[i].center.x()))&&(std::fabs(theObstacleModel.obstacles[i].center.y())-(std::fabs(theBallModel.estimate.position.y()))<=500.f)&&theObstacleModel.obstacles.size()!=2)
-        goto SnatchTheBall;
+        goto SnatchTheBall;//抢球
      
       
   }

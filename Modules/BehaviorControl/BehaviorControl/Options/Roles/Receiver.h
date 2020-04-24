@@ -54,9 +54,9 @@ state(ReadyToReceive)
     transition
     {
          
-         if((theBallModel.estimate.position.norm()<200)&&(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)&&state_time>15000)
+         if((theBallModel.estimate.position.norm()<200)&&(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut))
         goto searchForBall;
-        if((theBallModel.estimate.position.norm()<200)&&(theLibCodeRelease.timeSinceBallWasSeen < 300)&&state_time>11000)
+        if((theBallModel.estimate.position.norm()<200)&&(theLibCodeRelease.timeSinceBallWasSeen < 300))
         goto walkToBall;
     }
     
