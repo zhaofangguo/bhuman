@@ -12,7 +12,7 @@ option(Striker)
     transition
     {
       if(state_time > 1000)//这里的state_time=1000应该是state执行的时间吧，我猜的
-        goto JudgeBall;
+        goto JudgeGround;
     }
     action
     {
@@ -21,7 +21,21 @@ option(Striker)
     }
   }
   
-state(JudgeBall)
+  state(JudgeGround)
+  {
+    transition
+    {for(int j=0;j<int(theObstacleModel.obstacles.size());j++)
+      {if(theObstacleModel.obstacles[j].type==Obstacle::goalpost)
+      goto JudgeObs;}
+      goto TurnToRightAngle;
+    }
+    action
+    {
+      HeadControlMode(HeadControl::lookForward);
+      Stand();
+    }
+  }
+state(JudgeObs)
 {
   transition
   {
@@ -61,9 +75,6 @@ state(IfOrNot)
   {
      if((theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut||(std::fabs(theBallModel.estimate.position.x())>std::fabs(theObstacleModel.obstacles[i].center.x())))&&theObstacleModel.obstacles.size()!=2)//初始值是7000ms
         goto FindRobot; //壁障
-    if(theObstacleModel.obstacles.size()==2)
-     //goto SnatchTheBall;
-      goto turnToBall;//传球
       if((std::fabs(theBallModel.estimate.position.x())<=std::fabs(theObstacleModel.obstacles[i].center.x()))&&(std::fabs(theObstacleModel.obstacles[i].center.y())-(std::fabs(theBallModel.estimate.position.y()))<=500.f)&&theObstacleModel.obstacles.size()!=2)
         goto SnatchTheBall;//抢球
      
@@ -147,6 +158,51 @@ state(IfOrNot)
       Stand();
     }
   }
+  state(TurnToRightAngle)
+  {
+    transition
+    {
+      if(state_time>3000)
+  goto WalkToDestination;
+    }
+    action
+    {
+       HeadControlMode(HeadControlMode::lookForward);
+      WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(-18_deg,0.f, 0.f));
+    }
+  }
+  state(WalkToDestination)
+  {
+    transition
+    {
+      if(theOdometer.distanceWalked>1500.f)
+      goto JudgeTeamState;
+    }
+    action
+    {
+      WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f,1500.f, 0.f));
+      HeadControlMode(HeadControlMode::lookForward);
+    }
+  }
+  state(JudgeTeamState)
+  {
+    transition
+    {
+      for(int j=0;j<int(theObstacleModel.obstacles.size());j++)
+      {
+        if(theObstacleModel.obstacles[j].type==Obstacle::teammate)
+        {
+          if(theObstacleModel.obstacles[j].center.norm()>3605.f)
+          goto turnToBall;
+        }
+      }
+    }
+    action
+    {
+       HeadControlMode(HeadControlMode::lookLeftAndRight);
+       Stand();
+    }
+  }
   state(turnToBall)
   {
     transition
@@ -192,11 +248,7 @@ state(FindTeammate)
 {
   transition
   {
-    if(theObstacleModel.obstacles[1].type==Obstacle::teammate)
-    goto alignToGoal;
-  }
-  action
-  {
+
     HeadControlMode(HeadControl::lookForward);
       WalkAtRelativeSpeed(Pose2f(1.f, 0.f, 0.f));
   }

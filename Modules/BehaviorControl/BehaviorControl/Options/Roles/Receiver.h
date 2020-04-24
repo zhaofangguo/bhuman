@@ -5,11 +5,8 @@ initial_state(start)
 {
     transition
     {
-        if(state_time > 1000&&theObstacleModel.obstacles.size()==0)
-        goto NoObstacle;
-        if(state_time>1000&&theObstacleModel.obstacles.size()!=0)
-        goto JudgeTeammate;
-        
+        if(state_time > 1000)
+        goto TurnToRightAngle;    
     }
     action
     {
@@ -17,8 +14,49 @@ initial_state(start)
         Stand();
     }
 }
-
-state(JudgeTeammate)
+state(TurnToRightAngle)
+{
+  transition
+  {
+    if(state_time>3000)
+    goto WalkToDestination;
+  }
+  action
+  {
+    HeadControlMode(HeadControl::lookForward);
+     WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(12_deg,0.f,0.f));
+  }
+}
+state(WalkToDestination)
+{
+   transition
+    {
+        if(theOdometer.distanceWalked>5408.f)
+        goto TurnToTeammate;
+       
+    }
+    action
+    {
+        HeadControlMode(HeadControl::lookForward);
+        WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f,-3000.f,4500.f));
+    }
+}
+state(TurnToTeammate)
+{
+  transition
+  {
+    if(theObstacleModel.obstacles.size()!=0)
+     { for(int j=0;j<int(theObstacleModel.obstacles.size());j++)
+    {if(theObstacleModel.obstacles[j].type==Obstacle::teammate)
+    goto ReadyToReceive;}}
+  }
+  action
+{
+  HeadControlMode(HeadControl::lookForward);
+   WalkAtRelativeSpeed(Pose2f(1.f, 0.f, 0.f));
+}
+}
+/*state(JudgeTeammate)
 {
     transition
     {
@@ -35,7 +73,7 @@ state(JudgeTeammate)
         }
         Stand();
     }
-}
+}*/
 
 state(NoObstacle)
 {
@@ -54,9 +92,9 @@ state(ReadyToReceive)
     transition
     {
          
-         if((theBallModel.estimate.position.norm()<200)&&(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut))
+         if((theBallModel.estimate.position.norm()<500)&&(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut))
         goto searchForBall;
-        if((theBallModel.estimate.position.norm()<200)&&(theLibCodeRelease.timeSinceBallWasSeen < 300))
+        if((theBallModel.estimate.position.norm()<500)&&(theLibCodeRelease.timeSinceBallWasSeen < 300))
         goto walkToBall;
     }
     
