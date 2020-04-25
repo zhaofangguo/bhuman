@@ -175,12 +175,26 @@ state(IfOrNot)
   {
     transition
     {
-      if(theOdometer.distanceWalked>1500.f)
-      goto JudgeTeamState;
+      if(state_time>100000)//theOdometer.distanceWalked>1500.f
+      goto TurnToTeammate;
     }
     action
     {
       WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f,1500.f, 0.f));
+      HeadControlMode(HeadControlMode::lookForward);
+    }
+  }
+  state(TurnToTeammate)
+  {
+    transition
+    {
+      if(state_time>2000)
+      goto JudgeTeamState;
+    }
+    action
+    {
+      
+      WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(33.7_deg,0.f, 0.f));
       HeadControlMode(HeadControlMode::lookForward);
     }
   }

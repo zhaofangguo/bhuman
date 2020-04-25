@@ -31,14 +31,14 @@ state(WalkToDestination)
 {
    transition
     {
-        if(theOdometer.distanceWalked>5408.f)
+        if(state_time>100000)//theOdometer.distanceWalked>5408.f
         goto TurnToTeammate;
        
     }
     action
     {
         HeadControlMode(HeadControl::lookForward);
-        WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f,-3000.f,4500.f));
+        WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f,4500.f,4000.f));
     }
 }
 state(TurnToTeammate)
