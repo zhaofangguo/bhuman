@@ -24,9 +24,8 @@ option(Striker)
   state(JudgeGround)
   {
     transition
-    {for(int j=0;j<int(theObstacleModel.obstacles.size());j++)
-      {if(theObstacleModel.obstacles[j].type==Obstacle::goalpost)
-      goto JudgeObs;}
+    {if(theObstacleModel.obstacles.size()!=0)
+      goto JudgeObs;
       goto TurnToRightAngle;
     }
     action
@@ -76,7 +75,7 @@ state(IfOrNot)
      if((theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut||(std::fabs(theBallModel.estimate.position.x())>std::fabs(theObstacleModel.obstacles[i].center.x())))&&theObstacleModel.obstacles.size()!=2)//初始值是7000ms
         goto FindRobot; //壁障
       if((std::fabs(theBallModel.estimate.position.x())<=std::fabs(theObstacleModel.obstacles[i].center.x()))&&(std::fabs(theObstacleModel.obstacles[i].center.y())-(std::fabs(theBallModel.estimate.position.y()))<=500.f)&&theObstacleModel.obstacles.size()!=2)
-        goto SnatchTheBall;//抢球
+        goto turnToBallSnatch;//抢球
      
       
   }
@@ -87,7 +86,7 @@ state(IfOrNot)
   }
 }
 
-  state(SnatchTheBall)
+ /* state(SnatchTheBall)
   {
     transition
     {
@@ -148,8 +147,106 @@ state(IfOrNot)
       InWalkKick(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(theLibCodeRelease.angleToGoal, theBallModel.estimate.position.x() - 160.f, theBallModel.estimate.position.y() - 55.f));
     }//方向，腿，踢球姿势？，不过这个姿势很奇怪啊，球门角度，球后方160mm，左边55mm
 
-  }
+  }*/
   
+  state(turnToBallSnatch)
+  {
+    transition
+    {
+      if(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)//初始值是7000ms
+        goto searchForBallSnatch;//原来是searchForBall
+      if(std::abs(theBallModel.estimate.position.angle()) < 5_deg)
+        goto walkToBallSnatch;
+    }
+    action
+    {
+      HeadControlMode(HeadControl::lookForward);
+      WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(theBallModel.estimate.position.angle(), 0.f, 0.f));//两个参数是速度和目标位置，位置是相对机器人的位置
+    }//转向球时不需要考虑球的位置，只用调整到对准球的方向即可，所以theBallModel.estimate.position的
+  }
+state(walkToBallSnatch)
+  {
+    transition
+    {
+      if(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)
+        goto searchForBallSnatch;
+      if(theBallModel.estimate.position.norm() < 400.f)//原来是500.f如果球的什么参数小于500？这个参数还不太懂
+        goto alignToGoalSnatch;
+    }
+    action
+    {
+      HeadControlMode(HeadControl::lookForward);
+      WalkToTarget(Pose2f(50.f, 50.f, 50.f), theBallModel.estimate.position);//此处的target直接就是球的位置，走向球
+    }
+  }
+
+  state(alignToGoalSnatch)
+  {
+    transition
+    {
+      if(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)
+      goto searchForBallSnatch;
+     if(std::abs(theLibCodeRelease.angleToGoal) < 10_deg && std::abs(theBallModel.estimate.position.y()) < 100.f)
+        goto alignBehindBallSnatch;//目标角度小于10度且球的y坐标小于100时
+    }
+    action
+    {
+      HeadControlMode(HeadControl::lookForward);
+      WalkToTarget(Pose2f(100.f, 100.f, 100.f), Pose2f(theLibCodeRelease.angleToGoal, theBallModel.estimate.position.x() - 400.f, theBallModel.estimate.position.y()));//这里的x坐标-400应该是和机器人的脚的宽度有关系吧，我猜的
+      //Stand();
+    }//发现当pose2f作为速度变量是似乎都是用同一个构造函数
+  }
+
+  state(alignBehindBallSnatch)//在球的后方对齐，也不知道对齐哪里，还没看明白
+  {
+    transition
+    {
+      if(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)
+        goto searchForBallSnatch;
+      if(theLibCodeRelease.between(theBallModel.estimate.position.y(), 20.f, 50.f)
+         && theLibCodeRelease.between(theBallModel.estimate.position.x(), 140.f, 170.f)
+         && std::abs(theLibCodeRelease.angleToGoal) < 2_deg)//这块的lookForwardbetween还有待我仔细研究，为什么是这个判定条件？angleToGoal原来是相对球门的角度，这下可弄明白了
+        goto kickSnatch;
+    }
+    action
+    {
+      theHeadControlMode = HeadControl::lookForward;
+      WalkToTarget(Pose2f(80.f, 80.f, 80.f), Pose2f(theLibCodeRelease.angleToGoal, theBallModel.estimate.position.x() - 150.f, theBallModel.estimate.position.y() - 30.f));//此处的走向目标似乎是确定的目标?等我运行看看
+    }//这里的速度变了？
+  }
+
+  state(kickSnatch)
+  {
+    transition
+    {
+      if(state_time > 3000 || (state_time > 10 && action_done))//第一个判定条件应该是为了解决没踢到球的状况，第二个条件是踢到球的状况
+        goto stand;//原来是start
+    }
+    action
+    {
+      HeadControlMode(HeadControl::lookForward);
+      InWalkKick(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(theLibCodeRelease.angleToGoal, theBallModel.estimate.position.x() - 160.f, theBallModel.estimate.position.y() - 55.f));
+    }//方向，腿，踢球姿势？，不过这个姿势很奇怪啊，球门角度，球后方160mm，左边55mm
+
+  }
+  state(searchForBallSnatch)
+  {
+    transition
+    {
+     if(theLibCodeRelease.timeSinceBallWasSeen < 300)//找出限定条件？
+     //if(theObstacleModel.obstacles[0].center.x()==0)
+        goto turnToBallSnatch;//原来是turnToBall
+      //if(state_time >10000)
+        //goto GoToFindBall;
+    }
+    action
+    {
+      HeadControlMode(HeadControl::lookForward);
+      WalkAtRelativeSpeed(Pose2f(1.f, 0.f, 0.f));//此处的参数只有角度变量，所以可以进行原地转圈的检测方法
+     // WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f,theObstacleModel.obstacles[i].center.x(),theObstacleModel.obstacles[i].center.y()+500.f));//修改
+    }
+  }
+
   state(stand)
   {
     action
