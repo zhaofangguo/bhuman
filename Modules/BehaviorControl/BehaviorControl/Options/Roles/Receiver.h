@@ -31,7 +31,7 @@ state(WalkToDestination)
 {
    transition
     {
-        if(state_time>100000)//theOdometer.distanceWalked>5408.f
+        if(theOdometer.distanceWalked>16000.f)//theOdometer.distanceWalked>5408.f
         goto TurnToTeammate;
        
     }
@@ -39,6 +39,7 @@ state(WalkToDestination)
     {
         HeadControlMode(HeadControl::lookForward);
         WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f,4500.f,4000.f));
+        
     }
 }
 state(TurnToTeammate)
@@ -92,9 +93,9 @@ state(ReadyToReceive)
     transition
     {
          
-         if((theBallModel.estimate.position.norm()<500)&&(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut))
+         if((theBallModel.estimate.position.norm()<500.f)&&(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut))
         goto searchForBall;
-        if((theBallModel.estimate.position.norm()<500)&&(theLibCodeRelease.timeSinceBallWasSeen < 300))
+        if((theBallModel.estimate.position.norm()<500.f)&&(theLibCodeRelease.timeSinceBallWasSeen < 300))
         goto walkToBall;
     }
     

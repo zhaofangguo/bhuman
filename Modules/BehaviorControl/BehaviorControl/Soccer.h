@@ -29,6 +29,7 @@
 #include "Representations/Modeling/RobotPose.h"
 #include "Representations/Modeling/ObstacleModel.h"//修改
 #include "Representations/Modeling/Odometer.h"
+#include  "Representations/Modeling/GlobalFieldCoverage.h"//修改
 #include "Representations/MotionControl/GetUpEngineOutput.h"
 #include "Representations/MotionControl/HeadMotionEngineOutput.h"
 #include "Representations/MotionControl/HeadMotionRequest.h"
@@ -53,6 +54,7 @@ BEHAVIOR_OPTION(Soccer, BehaviorOptionInterface,
   REQUIRES(BallModel),
   REQUIRES(ObstacleModel),//修改
  // REQUIRES(Obstacle),//修改
+ REQUIRES(GlobalFieldCoverage),
  REQUIRES(Odometer),
   REQUIRES(BehaviorParameters),
   REQUIRES(CameraStatus),

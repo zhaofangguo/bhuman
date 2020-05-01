@@ -175,8 +175,9 @@ state(IfOrNot)
   {
     transition
     {
-      if(state_time>100000)//theOdometer.distanceWalked>1500.f
+      if(theOdometer.distanceWalked>11500.f)//theOdometer.distanceWalked>1500.f
       goto TurnToTeammate;
+      
     }
     action
     {
@@ -206,7 +207,7 @@ state(IfOrNot)
       {
         if(theObstacleModel.obstacles[j].type==Obstacle::teammate)
         {
-          if(theObstacleModel.obstacles[j].center.norm()>3605.f)
+          if(theObstacleModel.obstacles[j].center.norm()>3005.f)
           goto turnToBall;
         }
       }
@@ -239,34 +240,17 @@ state(IfOrNot)
     {
       if(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)
         goto searchForBall;
-      if(theBallModel.estimate.position.norm() < 500.f&&theObstacleModel.obstacles.size()==2)//原来是500.f如果球的什么参数小于500？这个参数还不太懂
+      if(theBallModel.estimate.position.norm() < 500.f)//原来是500.f如果球的什么参数小于500？这个参数还不太懂
         goto alignToGoal;
-        if(theBallModel.estimate.position.norm() < 500.f&&theObstacleModel.obstacles.size()!=2)
-        goto FindTeammate;
+       
     }
     action
     {
       HeadControlMode(HeadControl::lookForward);
-      if(theObstacleModel.obstacles.size()!=0)
-   {
-     for(int j=0;j<int(theObstacleModel.obstacles.size());j++)
-     { if(theObstacleModel.obstacles[j].type==Obstacle:: teammate)
-      {teammatenum=j;
-      break;
-      }}
-     }
       WalkToTarget(Pose2f(50.f, 50.f, 50.f), theBallModel.estimate.position);//此处的target直接就是球的位置，走向球
     }
   }
-state(FindTeammate)
-{
-  transition
-  {
 
-    HeadControlMode(HeadControl::lookForward);
-      WalkAtRelativeSpeed(Pose2f(1.f, 0.f, 0.f));
-  }
-}
   state(alignToGoal)
   { if(theObstacleModel.obstacles.size()!=0)
    {
@@ -328,6 +312,7 @@ state(FindTeammate)
       break;
       }}
      }
+     
     transition
     {
       if(state_time > 3000 || (state_time > 10 && action_done))//第一个判定条件应该是为了解决没踢到球的状况，第二个条件是踢到球的状况
