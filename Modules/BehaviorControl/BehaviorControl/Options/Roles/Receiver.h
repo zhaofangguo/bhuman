@@ -24,7 +24,7 @@ state(TurnToRightAngle)
   action
   {
     HeadControlMode(HeadControl::lookForward);
-     WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(12_deg,0.f,0.f));
+     WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(12_deg,0.f,0.f));//12
   }
 }
 state(WalkToDestination)
@@ -38,7 +38,7 @@ state(WalkToDestination)
     action
     {
         HeadControlMode(HeadControl::lookForward);
-        WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f,4500.f,4000.f));
+        WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f,4500.f,4000.f));//4500,4000
         
     }
 }
@@ -76,14 +76,14 @@ state(TurnToTeammate)
     }
 }*/
 
-state(NoObstacle)
+/*state(NoObstacle)
 {
     action
     {
     HeadControlMode(HeadControl::lookForward);
     Stand();
     }
-}
+}*/
 state(ReadyToReceive)
 {for(i=0;i<int(theObstacleModel.obstacles.size());i++)
         {
@@ -161,7 +161,7 @@ state(ReadyToReceive)
     transition
     {
       if(state_time > 3000 || (state_time > 10 && action_done))//第一个判定条件应该是为了解决没踢到球的状况，第二个条件是踢到球的状况
-        goto NoObstacle;//原来是start
+        goto walkToBall;//原来是start
     }
     action
     {

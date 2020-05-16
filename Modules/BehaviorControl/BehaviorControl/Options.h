@@ -25,7 +25,8 @@
 #include "Options/Output/PlaySound.h"
 
 #include "Options/Roles/Striker.h"
-#include"Options/Roles/Receiver.h"//修改
+#include "Options/Roles/Receiver.h"//修改
+#include "Options/Roles/Keeper.h"
 
 #include "Options/Skills/GetUp.h"
 

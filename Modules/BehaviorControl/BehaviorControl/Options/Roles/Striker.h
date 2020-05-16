@@ -303,9 +303,9 @@ state(walkToBallSnatch)
     {
       for(int j=0;j<int(theObstacleModel.obstacles.size());j++)
       {
-        if(theObstacleModel.obstacles[j].type==Obstacle::teammate)
+        if(theObstacleModel.obstacles[j].type==Obstacle::teammate&&theObstacleModel.obstacles.size()==1)
         {
-          if(theObstacleModel.obstacles[j].center.norm()>3005.f)
+          if(theObstacleModel.obstacles[j].center.norm()>3005.f&&theObstacleModel.obstacles[j].center.norm()<3015.f)
           goto turnToBall;
         }
       }
@@ -314,6 +314,7 @@ state(walkToBallSnatch)
     {
        HeadControlMode(HeadControlMode::lookLeftAndRight);
        Stand();
+       
     }
   }
   state(turnToBall)
@@ -493,7 +494,7 @@ state(walkToBallSnatch)
     action
     {
         HeadControlMode(HeadControl::lookForward);
-        WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f,x+200.f,y-500.f));//修改
+        WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(rotation,x+200.f,y-500.f));//修改
     }
   }
   state(turnToBallwhenObs)

@@ -18,8 +18,13 @@ option(PlayingState)
             Striker();
             break;
           }
+          case 5:
+          {
+            Keeper();
+            break;
+          }
         }
-      }
+     }
       
     }
   }
